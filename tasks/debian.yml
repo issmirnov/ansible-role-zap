@@ -1,9 +1,11 @@
 ---
 - name: create Zap group
   group: name=zap  state=present
+  become: yes
 
 - name: Create user to run zap
   user: name=zap group=zap createhome=no
+  become: yes
 
 # We need to be root to bind to port 80.
 - name: set user for systemd script
@@ -56,5 +58,6 @@
     owner: root
     group: root
     mode: 0640
+  become: yes
   notify:
     - "restart zap {{ ansible_os_family|lower }}"
