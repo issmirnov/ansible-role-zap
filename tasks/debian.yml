@@ -1,0 +1,60 @@
+---
+- name: create Zap group
+  group: name=zap  state=present
+
+- name: Create user to run zap
+  user: name=zap group=zap createhome=no
+
+# We need to be root to bind to port 80.
+- name: set user for systemd script
+  set_fact:
+    zap_user: "{{ 'root' if  zap_standalone  else 'zap' }}"
+  when: zap_user is undefined
+
+# TODO: consider making this a knob.
+- name: create zap data dir in /etc/zap
+  file:
+    dest: /etc/zap
+    state: directory
+    owner: zap
+    group: zap
+
+
+# download binary, check bits
+- name: get latest release
+  uri:
+      url: https://api.github.com/repos/issmirnov/zap/releases/latest
+      return_content: yes
+  register: release
+
+# - debug:
+#     var: release.json.assets
+
+- name: get package url
+  set_fact:
+    zap_release_json: "{{ item }}"
+  with_items: "{{ release.json.assets }}"
+  when: '"Linux_64" in item.name'
+
+- name: get zap
+  unarchive:
+    src: "{{ zap_release_json.browser_download_url }}"
+    dest: "{{ zap_bin_path}}"
+    copy: no
+    list_files: no
+    creates: "{{ zap_bin_path }}/zap"
+    exclude:
+      - LICENSE
+      - README.md
+      - c.yml
+
+# write service file.
+- name: Write systemd service file
+  template:
+    src: zap.service.j2
+    dest: /etc/systemd/system/zap.service
+    owner: root
+    group: root
+    mode: 0640
+  notify:
+    - "restart zap {{ ansible_os_family|lower }}"

@@ -1,0 +1,6 @@
+---
+- name: Install zap
+  homebrew:
+    name: issmirnov/apps/zap
+    state: latest
+    update_homebrew: yes

@@ -1,0 +1,16 @@
+---
+- name: restart zap debian
+  service: name=zap state=restarted
+  become: "{{ zap_standalone }}"
+
+- name: restart zap darwin
+  command: brew services restart zap
+  become: "{{ zap_standalone }}"
+
+- name: start zap debian
+  service: name=zap state=started
+  become: "{{ zap_standalone }}"
+
+- name: start zap darwin
+  command: brew services start zap
+  become: "{{ zap_standalone }}"

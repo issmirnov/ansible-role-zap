@@ -1,0 +1,23 @@
+galaxy_info:
+  author: Ivan Smirnov
+  description: your description
+  license: MIT
+  min_ansible_version: 1.2
+
+  platforms:
+  - name: MacOSX
+    versions:
+      - all
+  - name: Ubuntu
+    versions:
+      - vivid
+      - wily
+      - xenial
+      - yakkety
+  - name: Debian
+    versions:
+      - all
+
+  galaxy_tags:
+    - zap
+    - url_rewriter

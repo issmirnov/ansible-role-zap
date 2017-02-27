@@ -1,0 +1,17 @@
+---
+zap_standalone: yes
+zap_host: 127.0.0.1
+zap_port: 80
+zap_config:
+  e:
+    expand: example.com
+    a:
+      expand: apples
+    b:
+      expand: bananas
+  g:
+    expand: github.com
+    d:
+      expand: issmirnov/dotfiles
+    z:
+      expand: issmirnov/zap

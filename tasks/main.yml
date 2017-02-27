@@ -1,0 +1,50 @@
+---
+- name: Load distribution specific variables
+  include_vars: "defaults/{{ansible_os_family | lower }}.yml"
+  tags:
+    - zap_config
+
+- name: Run OS specific tasks.
+  include: "{{ansible_os_family | lower }}.yml"
+
+
+# NOTE: our keys get alphabetized, so 'expand' is lost in depths.
+# This means if you want to manage config by hand, you're better off
+# not using the {{ zap_config }} option
+- name: Write zap config to {{ zap_config_location }}/c.yml
+  copy:
+    content: "{{ zap_config | to_nice_yaml(indent=2) }}"
+    dest: "{{ zap_config_location }}/c.yml"
+  when: zap_config is defined
+  tags:
+    - zap_config
+  notify:
+    - "restart zap {{ ansible_os_family|lower }}"
+
+- name: Write zap header to /etc/hosts
+  lineinfile:
+    dest: /etc/hosts
+    line: "### Zap Shortcuts ###"
+    state: present
+    insertafter: EOF
+  when: zap_config is defined
+  become: yes
+  tags: zap_dns
+
+
+- name: add shortcuts to /etc/hosts
+  lineinfile:
+    dest: /etc/hosts
+    regexp: '.*{{ item }}$'
+    line: "{{ zap_host }} {{item}}"
+    state: present
+    insertafter: "### Zap Shortcuts ###"
+  when: zap_config is defined
+  with_items: "{{ zap_config }}"
+  become: yes
+  tags: zap_dns
+  notify:
+    - "start zap {{ ansible_os_family|lower }}"
+
+#- name: Start service
+#-  meta: flush_handlers

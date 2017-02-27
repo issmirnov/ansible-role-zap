@@ -1,0 +1,16 @@
+[Unit]
+Description=Zap (URL text expander)
+After=syslog.target
+After=network.target
+
+[Service]
+Type=simple
+User={{ zap_user }}
+Group=zap
+WorkingDirectory={{ zap_config_location }}
+ExecStart={{ zap_bin_path }}/zap -port {{ zap_port }} -config c.yml
+Restart=always
+RestartSec=2s
+
+[Install]
+WantedBy=multi-user.target
