@@ -15,6 +15,7 @@
 
 # TODO: consider making this a knob.
 - name: create zap data dir in /etc/zap
+  become: yes
   file:
     dest: /etc/zap
     state: directory
@@ -39,6 +40,7 @@
   when: '"Linux_64" in item.name'
 
 - name: get zap
+  become: yes
   unarchive:
     src: "{{ zap_release_json.browser_download_url }}"
     dest: "{{ zap_bin_path}}"
