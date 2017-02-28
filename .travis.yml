@@ -1,41 +1,38 @@
 ---
-language: python
-python: "2.7"
+# Credit: https://github.com/geerlingguy/ansible-role-apache/blob/master/.travis.yml
+services: docker
 
-sudo: true
+env:
+  - distro: ubuntu1604
+    init: /lib/systemd/systemd
+    run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
 
-# Install ansible
-addons:
-  apt:
-    packages:
-    - python-pip
-
-install:
-  # Install ansible
-  - pip install ansible
-
-  # Check ansible version
-  - ansible --version
-
-  # Create ansible.cfg with correct roles_path
-  - printf '[defaults]\nroles_path=../' >ansible.cfg
+before_install:
+  # Pull container.
+  - 'docker pull geerlingguy/docker-${distro}-ansible:latest'
 
 script:
-  # Basic role syntax check
-  - ansible-playbook tests/test.yml -i tests/inventory --syntax-check
+  - container_id=$(mktemp)
+  # Run container in detached state.
+  - 'docker run --detach --volume="${PWD}":/etc/ansible/roles/ansible-role-zap:ro ${run_opts} geerlingguy/docker-${distro}-ansible:latest "${init}" > "${container_id}"'
 
-  # first run
-  - ansible-playbook tests/test.yml -i tests/inventory --connection=local
+  # Ansible syntax check.
+  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-playbook /etc/ansible/roles/ansible-role-zap/tests/test.yml --syntax-check'
 
-  # second run, verify idempotency
+  # Test role.
+  - 'docker exec "$(cat ${container_id})" ansible-playbook /etc/ansible/roles/ansible-role-zap/tests/test.yml'
+
+  # Test role idempotence.
+  - idempotence=$(mktemp)
+  - docker exec "$(cat ${container_id})" ansible-playbook /etc/ansible/roles/ansible-role-zap/tests/test.yml | tee -a ${idempotence}
   - >
-    ansible-playbook tests/test.yml -i tests/inventory --connection=local
+    tail ${idempotence}
     | grep -q 'changed=0.*failed=0'
-    && (echo 'Update test: pass' && exit 0)
-    || (echo 'Update test: fail' && exit 1)
+    && (echo 'Idempotence test: pass' && exit 0)
+    || (echo 'Idempotence test: fail' && exit 1)
 
   # Verify service is running.
-  - curl -I localhost:80
+  #- curl -I localhost:80
 
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/
