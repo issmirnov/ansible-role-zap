@@ -24,18 +24,22 @@ script:
   # Basic role syntax check
   - ansible-playbook tests/test.yml -i tests/inventory --syntax-check
 
+  # We can't run this playbook. Travis uses ubuntu 14.04 which doesn't have systemd.
+  # We also can't use docker, since it touches /etc/hosts and that fails.
+  # So, sticking to a syntax check for now.
+  
   # first run
-  - ansible-playbook tests/test.yml -i tests/inventory --connection=local
+  #- ansible-playbook tests/test.yml -i tests/inventory --connection=local
 
   # second run, verify idempotency
-  - >
-    ansible-playbook tests/test.yml -i tests/inventory --connection=local
-    | grep -q 'changed=0.*failed=0'
-    && (echo 'Update test: pass' && exit 0)
-    || (echo 'Update test: fail' && exit 1)
+  #- >
+  #  ansible-playbook tests/test.yml -i tests/inventory --connection=local
+  #  | grep -q 'changed=0.*failed=0'
+  #  && (echo 'Update test: pass' && exit 0)
+  #  || (echo 'Update test: fail' && exit 1)
 
   # Verify service is running.
-  - curl -I localhost:80
+  #- curl -I localhost:80
 
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/
