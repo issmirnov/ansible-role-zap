@@ -3,18 +3,18 @@
   service: name=zap state=restarted
   become: "{{ zap_standalone }}"
 
+- name: start zap debian
+  service: name=zap state=started
+  become: "{{ zap_standalone }}"
+
 - name: restart zap darwin
-  command: brew services restart zap
+  command: /usr/local/bin/brew services restart zap
+  become: "{{ zap_standalone }}"
+
+- name: start zap darwin
+  command: /usr/local/bin/brew services start zap
   become: "{{ zap_standalone }}"
 
 - name: reload nginx
   service: name=nginx state=reloaded
   become: yes
-
-- name: start zap debian
-  service: name=zap state=started
-  become: "{{ zap_standalone }}"
-
-- name: start zap darwin
-  command: brew services start zap
-  become: "{{ zap_standalone }}"

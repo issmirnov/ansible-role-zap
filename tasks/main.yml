@@ -4,12 +4,8 @@
   tags:
     - zap_config
 
-- debug:
-    var: zap_port
-
 - name: Run OS specific tasks.
   include: "{{ansible_os_family | lower }}.yml"
-
 
 # NOTE: our keys get alphabetized, so 'expand' is lost in depths.
 # This means if you want to manage config by hand, you're better off
