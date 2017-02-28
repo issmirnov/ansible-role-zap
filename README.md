@@ -59,6 +59,16 @@ If you are provisioning a bare bones server, you can prepend this stanza to inst
       raw: sudo apt-get -y install python-simplejson
 ```
 
+## Notes
+
+- This playbook will not remove deleted entries, nor will it gracefully handle
+  conflicting DNS entries. This is the responsibility of the user.
+  
+## TODO
+
+- Add knob that allows user to have zap run under `0.0.0.0`.
+  - `zap_public`, used in config flags.
+
 ## License
 
 MIT

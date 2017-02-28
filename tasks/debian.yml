@@ -23,15 +23,11 @@
     group: zap
 
 
-# download binary, check bits
 - name: get latest release
   uri:
       url: https://api.github.com/repos/issmirnov/zap/releases/latest
       return_content: yes
   register: release
-
-# - debug:
-#     var: release.json.assets
 
 - name: get package url
   set_fact:
@@ -63,3 +59,46 @@
   become: yes
   notify:
     - "restart zap {{ ansible_os_family|lower }}"
+
+# if ! zap_standalone: no and nginx installed, write nginx config and reload.
+- name: Check if nginx is installed
+  command: dpkg-query -l nginx
+  register: nginx_check
+  when: not zap_standalone
+  changed_when: false
+  tags:
+    - zap_nginx
+
+- name: generate list of shortcuts for nginx
+  set_fact:
+    zap_shortcuts: "{% for tld in zap_config %} {{tld}}{% endfor %}"
+  when: nginx_check.rc == 0
+  tags:
+    - zap_nginx
+
+- name: Write nginx config for zap to /etc/nginx/sites-available/zap.conf
+  template:
+    src: zap.conf.j2
+    dest: /etc/nginx/sites-available/zap.conf
+    owner: root
+    group: root
+    mode: 0640
+  become: yes
+  when: nginx_check.rc == 0
+  notify:
+    - reload nginx
+  tags:
+    - zap_nginx
+
+
+- name: enable the nginx config
+  file:
+    src: /etc/nginx/sites-available/zap.conf
+    dest: /etc/nginx/sites-enabled/zap.conf
+    state: link
+  become: yes
+  when: nginx_check.rc == 0
+  notify:
+    - reload nginx
+  tags:
+    - zap_nginx

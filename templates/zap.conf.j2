@@ -1,0 +1,10 @@
+# nginx config for zap when using web server mode.
+server {
+    listen 80; # Keep as 80, make sure nginx listens on 80 too
+    server_name {{ zap_shortcuts }};
+    location / {
+        proxy_http_version 1.1;
+        proxy_pass http://localhost:{{ zap_port }};
+        proxy_set_header X-Forwarded-Host $host;
+    }
+}

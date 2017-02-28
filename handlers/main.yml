@@ -7,6 +7,10 @@
   command: brew services restart zap
   become: "{{ zap_standalone }}"
 
+- name: reload nginx
+  service: name=nginx state=reloaded
+  become: yes
+
 - name: start zap debian
   service: name=zap state=started
   become: "{{ zap_standalone }}"

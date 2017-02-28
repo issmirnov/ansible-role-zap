@@ -1,7 +1,7 @@
 ---
 zap_standalone: yes
 zap_host: 127.0.0.1
-zap_port: 80
+zap_port: "{{ 80 if zap_standalone else 8927 }}"
 zap_config:
   e:
     expand: example.com
