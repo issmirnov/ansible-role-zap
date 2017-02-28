@@ -65,14 +65,19 @@
   command: dpkg-query -l nginx
   register: nginx_check
   when: not zap_standalone
+  ignore_errors: yes
   changed_when: false
   tags:
     - zap_nginx
 
+- name: set flag for setting up nginx
+  set_fact:
+    setup_nginx: not zap_standalone and nginx_check.rc is defined and nginx_check.rc == 0
+
 - name: generate list of shortcuts for nginx
   set_fact:
     zap_shortcuts: "{% for tld in zap_config %} {{tld}}{% endfor %}"
-  when: nginx_check.rc == 0
+  when: setup_nginx
   tags:
     - zap_nginx
 
@@ -84,12 +89,11 @@
     group: root
     mode: 0640
   become: yes
-  when: nginx_check.rc == 0
+  when: setup_nginx
   notify:
     - reload nginx
   tags:
     - zap_nginx
-
 
 - name: enable the nginx config
   file:
@@ -97,7 +101,7 @@
     dest: /etc/nginx/sites-enabled/zap.conf
     state: link
   become: yes
-  when: nginx_check.rc == 0
+  when: setup_nginx
   notify:
     - reload nginx
   tags:
