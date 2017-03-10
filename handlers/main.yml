@@ -4,7 +4,7 @@
   become: yes
 
 - name: start zap debian
-  service: name=zap state=started
+  service: name=zap state=started enabled=yes
   become: yes
 
 - name: restart zap darwin
