@@ -36,6 +36,18 @@
   with_items: "{{ release.json.assets }}"
   when: '"Linux_64" in item.name'
 
+- name: check if zap installed and is outdated
+  command: zap -v
+  register: zap_version
+  changed_when: false
+
+# small hack that lets us avoid ansible string concat, due to leading 'v'
+- name: delete old zap binary
+  file:
+    path: "{{ zap_bin_path }}/zap"
+    state: absent
+  when: zap_version.stdout not in release.json.name
+
 - name: get zap
   become: yes
   unarchive:
