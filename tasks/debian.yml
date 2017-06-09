@@ -32,6 +32,7 @@
 - name: get package url
   set_fact:
     zap_release_json: "{{ item }}"
+  no_log: yes
   with_items: "{{ release.json.assets }}"
   when: '"Linux_64" in item.name'
 
