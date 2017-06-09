@@ -47,6 +47,8 @@
     path: "{{ zap_bin_path }}/zap"
     state: absent
   when: zap_version.stdout not in release.json.name
+  notify:
+    - "restart zap {{ ansible_os_family|lower }}"
 
 - name: get zap
   become: yes
