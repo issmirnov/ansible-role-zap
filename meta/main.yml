@@ -2,7 +2,7 @@ galaxy_info:
   author: Ivan Smirnov
   description: Installs zap, a url redirector.
   license: MIT
-  min_ansible_version: 1.2
+  min_ansible_version: 2.4
 
   platforms:
   - name: MacOSX
