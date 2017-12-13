@@ -40,13 +40,13 @@
   command: zap -v
   register: zap_version
   changed_when: false
+  failed_when: false
 
-# small hack that lets us avoid ansible string concat, due to leading 'v'
 - name: delete old zap binary
   file:
     path: "{{ zap_bin_path }}/zap"
     state: absent
-  when: zap_version.stdout not in release.json.name
+  when: zap_version.rc != 2 and zap_version.stdout not in release.json.name
   notify:
     - "restart zap {{ ansible_os_family|lower }}"
 
