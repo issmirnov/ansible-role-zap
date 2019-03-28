@@ -7,17 +7,9 @@ python:
 services: docker
 
 env:
-  - distro: ubuntu1404
   - distro: ubuntu1604
-  - distro: ubuntu1610
-  - distro: ubuntu1704
-  - distro: ubuntu1710
   - distro: ubuntu1804
   - distro: ubuntu1810
-  - distro: centos6
-  - distro: centos7
-  - distro: debian8
-  - distro: debian9
   - distro: debian10
 
 before_install:
