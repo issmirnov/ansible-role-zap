@@ -2,5 +2,7 @@
 - name: Test zap deployment.
   hosts: localhost
   remote_user: root
+  vars:
+    github_api: "https://github.cache.smirnov.cloud"
   roles:
     - ansible-role-zap
