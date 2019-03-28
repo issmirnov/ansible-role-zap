@@ -15,3 +15,5 @@ zap_config:
       expand: issmirnov/dotfiles
     z:
       expand: issmirnov/zap
+github_api: "https://api.github.com" # used to bypass rate limit in continuous testing
+
