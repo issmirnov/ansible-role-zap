@@ -26,7 +26,7 @@ before_install:
   - go get -v github.com/fubarhouse/ansible-role-tester
 
 script:
-  - ansible-role-tester full --playbook tests/test.yml --distribution ${distro}
+  - ansible-role-tester full --distribution ${distro}
 
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/
