@@ -25,7 +25,7 @@
 
 - name: get latest release
   uri:
-      url: https://api.github.com/repos/issmirnov/zap/releases/latest
+      url: "{{github_api}}/repos/issmirnov/zap/releases/latest"
       return_content: yes
   register: release
 
