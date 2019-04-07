@@ -11,6 +11,7 @@ env:
   - distro: ubuntu1804
   - distro: ubuntu1810
   - distro: debian10
+  - distro: centos7
 
 before_install:
   - sudo pip install --upgrade pip
