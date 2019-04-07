@@ -7,6 +7,14 @@
   service: name=zap state=started enabled=yes
   become: yes
 
+- name: restart zap redhat
+  service: name=zap state=restarted
+  become: yes
+
+- name: start zap redhat
+  service: name=zap state=started enabled=yes
+  become: yes
+
 - name: restart zap darwin
   command: /usr/local/bin/brew services restart zap
   become: "{{ zap_standalone }}"

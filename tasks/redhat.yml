@@ -1,0 +1,111 @@
+---
+- name: create Zap group
+  group: name=zap  state=present
+  become: yes
+
+- name: Create user to run zap
+  user: name=zap group=zap createhome=no
+  become: yes
+
+# We need to be root to bind to port 80.
+- name: set user for systemd script
+  set_fact:
+    zap_user: "{{ 'root' if  zap_standalone  else 'zap' }}"
+  when: zap_user is undefined
+
+# TODO: consider making this a knob.
+- name: create zap data dir in /etc/zap
+  become: yes
+  file:
+    dest: /etc/zap
+    state: directory
+    owner: zap
+    group: zap
+
+
+- name: get latest release
+  uri:
+      url: "{{github_api}}/repos/issmirnov/zap/releases/latest"
+      return_content: yes
+  register: release
+
+- name: get package url
+  set_fact:
+    zap_release_json: "{{ item }}"
+  no_log: yes
+  with_items: "{{ release.json.assets }}"
+  when: '"Linux_64" in item.name'
+
+- name: check if zap installed and is outdated
+  command: zap -v
+  register: zap_version
+  changed_when: false
+  failed_when: false
+
+- name: delete old zap binary
+  file:
+    path: "{{ zap_bin_path }}/zap"
+    state: absent
+  when: zap_version.rc != 2 and zap_version.stdout not in release.json.name
+  notify:
+    - "restart zap {{ ansible_os_family|lower }}"
+
+- name: get zap
+  become: yes
+  unarchive:
+    src: "{{ zap_release_json.browser_download_url }}"
+    dest: "{{ zap_bin_path}}"
+    copy: no
+    list_files: no
+    creates: "{{ zap_bin_path }}/zap"
+    exclude:
+      - LICENSE
+      - README.md
+      - c.yml
+
+# write service file.
+- name: Write systemd service file
+  template:
+    src: zap.service.j2
+    dest: /etc/systemd/system/zap.service
+    owner: root
+    group: root
+    mode: 0640
+  become: yes
+  notify:
+    - "restart zap {{ ansible_os_family|lower }}"
+
+# if ! zap_standalone: no and nginx installed, write nginx config and reload.
+- name: Check if nginx is installed
+  shell: rpm -qa | grep nginx
+  register: nginx_check
+  when: not zap_standalone
+  ignore_errors: yes
+  changed_when: false
+  tags:
+    - zap_nginx
+
+- name: set flag for setting up nginx
+  set_fact:
+    setup_nginx: not zap_standalone and nginx_check.rc is defined and nginx_check.rc == 0
+
+- name: generate list of shortcuts for nginx
+  set_fact:
+    zap_shortcuts: "{% for tld in zap_config %} {{tld}}{% endfor %}"
+  when: setup_nginx
+  tags:
+    - zap_nginx
+
+- name: Write nginx config for zap to /etc/nginx/conf.d/zap.conf
+  template:
+    src: zap.conf.j2
+    dest: /etc/nginx/conf.d/zap.conf
+    owner: root
+    group: root
+    mode: 0640
+  become: yes
+  when: setup_nginx
+  notify:
+    - reload nginx
+  tags:
+    - zap_nginx
