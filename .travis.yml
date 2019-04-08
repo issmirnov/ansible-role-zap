@@ -20,6 +20,7 @@ before_install:
 
 script:
   - ansible-role-tester full --distribution ${distro}
+  - ansible-role-tester full --distribution ${distro} --playbook tests/playbook-nginx.yml # test nginx stack
 
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/
