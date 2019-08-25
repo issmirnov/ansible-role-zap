@@ -1,11 +1,11 @@
 ---
 - name: Load distribution specific variables
-  include_vars: "defaults/{{ansible_os_family | lower }}.yml"
+  include_vars: "defaults/{{ ansible_os_family | lower }}.yml"
   tags:
     - zap_config
 
 - name: Run OS specific tasks.
-  include_tasks: "{{ansible_os_family | lower }}.yml"
+  include_tasks: "{{ ansible_os_family | lower }}.yml"
 
 - name: read /proc/1/cgroup
   shell: cat /proc/1/cgroup
@@ -34,7 +34,7 @@
   lineinfile:
     dest: /etc/hosts
     regexp: '{{ zap_host }} {{ item }}$'
-    line: "{{ zap_host }} {{item}}"
+    line: "{{ zap_host }} {{ item }}"
     state: present
     insertafter: "### Zap Shortcuts ###"
     unsafe_writes: "{{ is_docker }}"

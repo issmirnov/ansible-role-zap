@@ -39,4 +39,3 @@
           - curl_result.rc == 0
           - curl_result.stdout == "https://github.com/"
         msg: "expecting redirection to github"
-
