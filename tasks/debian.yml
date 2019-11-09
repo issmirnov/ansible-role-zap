@@ -87,7 +87,7 @@
 
 - name: set flag for setting up nginx
   set_fact:
-    setup_nginx: not zap_standalone and nginx_check.rc is defined and nginx_check.rc == 0
+    setup_nginx: "{{ not zap_standalone and nginx_check.rc is defined and nginx_check.rc == 0 | bool }}"
 
 - name: generate list of shortcuts for nginx
   set_fact:
