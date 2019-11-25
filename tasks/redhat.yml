@@ -1,11 +1,11 @@
 ---
 - name: create Zap group
   group: name=zap  state=present
-  become: yes
+  become: true
 
 - name: Create user to run zap
   user: name=zap group=zap createhome=no
-  become: yes
+  become: true
 
 # We need to be root to bind to port 80.
 - name: set user for systemd script
@@ -15,7 +15,7 @@
 
 # TODO: consider making this a knob.
 - name: create zap data dir in /etc/zap
-  become: yes
+  become: true
   file:
     dest: /etc/zap
     state: directory

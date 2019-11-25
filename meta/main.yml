@@ -1,3 +1,4 @@
+---
 galaxy_info:
   author: Ivan Smirnov
   description: Installs zap, a url redirector.

@@ -1,2 +1,3 @@
+---
 zap_config_location: /etc/zap
 zap_bin_path: /usr/local/bin
