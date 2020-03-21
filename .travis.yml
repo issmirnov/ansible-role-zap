@@ -16,9 +16,7 @@ python:
 services: docker
 
 env:
-  - distro: ubuntu1604
   - distro: ubuntu1804
-  - distro: ubuntu1810
   - distro: debian10
   - distro: centos7
 
