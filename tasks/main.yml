@@ -11,6 +11,7 @@
   shell: cat /proc/1/cgroup
   changed_when: false
   register: cgroup_1
+  failed_when: false
 
 - name: detect if we are in docker
   changed_when: false
