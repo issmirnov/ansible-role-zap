@@ -46,6 +46,7 @@
   notify:
     - "start zap {{ ansible_os_family|lower }}"
 
+
 # NOTE: our keys get alphabetized, so 'expand' is lost in depths.
 # This means if you want to manage config by hand, you're better off
 # not using the {{ zap_config }} option
@@ -69,6 +70,20 @@
   failed_when: dnsmasq_check.rc != 1 and dnsmasq_check.rc != 0
   tags:
     - zap_dnsmasq
+
+- name: add shorcuts to /etc/dnsmasq.d/927-zap.conf # 927 = ZAP on T9 keyboard
+  lineinfile:
+    dest: /etc/dnsmasq.d/927-zap.conf
+    regexp: 'address=/{{ item }}/{{ zap_host }}$'
+    line: "address=/{{ item }}/{{ zap_host }}"
+    state: present
+    insertafter: "### Zap Shortcuts ###"
+    unsafe_writes: "{{ is_docker }}"
+    create: yes
+  when: zap_config is defined and dnsmasq_check.rc == 0
+  with_items: "{{ zap_config }}"
+  become: yes
+  tags: zap_dns
 
 - name: Attempt reload of dnsmasq
   when: ansible_os_family == 'Debian' and dnsmasq_check.rc == 0
