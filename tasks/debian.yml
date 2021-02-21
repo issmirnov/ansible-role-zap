@@ -29,12 +29,22 @@
       return_content: yes
   register: release
 
+- name: set arch table
+  set_fact:
+    zap_arch_table:
+      x86_64: Linux_64
+      aarch64: Linux_Arm
+- name: set arch name
+  set_fact:
+    file_pattern: "{{ zap_arch_table[ansible_architecture] }}"
+
 - name: get package url
   set_fact:
     zap_release_json: "{{ item }}"
   no_log: yes
   with_items: "{{ release.json.assets }}"
-  when: '"Linux_64" in item.name'
+  when: 'file_pattern in item.name'
+
 
 - name: check if zap installed and is outdated
   command: zap -v
