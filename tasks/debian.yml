@@ -82,6 +82,10 @@
     group: root
     mode: 0640
   become: yes
+  register: systemd_service
+
+- name: restart zap
+  when: systemd_service.changed
   notify:
     - "restart zap {{ ansible_os_family|lower }}"
 
