@@ -56,8 +56,9 @@
   when: zap_config is defined
   tags:
     - zap_config
-  notify:
-    - "restart zap {{ ansible_os_family|lower }}"
+  # temporarily disable for idempotency  
+  # notify:
+  #   - "restart zap {{ ansible_os_family|lower }}"
 
 # convenience helper - if dnsmasq installed and on debian, attempt a reload
 # if it's not running we ignore the error.
